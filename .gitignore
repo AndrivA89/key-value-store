@@ -1,0 +1,25 @@
+# IDE
+.idea
+.vscode
+vendor
+
+# macOS
+.DS_Store
+
+# Output of the go covetage tool
+*.out
+cover.html
+
+# Test binary `go test -c`
+*.test
+!.env.test
+
+.git
+bin/*
+public/ui
+
+tmp/*
+!tmp/.keep
+
+.tmp/*
+!.tmp/.keep
