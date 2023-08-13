@@ -2,7 +2,7 @@ package transaction
 
 import "github.com/AndrivA89/key-value-store/internal/entity"
 
-type FileLoggerInterface interface {
+type Logger interface {
 	WriteDelete(key string)
 	WritePut(key, value string)
 	Err() <-chan error

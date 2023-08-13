@@ -6,21 +6,30 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	_ "github.com/lib/pq"
 
 	"github.com/AndrivA89/key-value-store/internal/entity"
 	"github.com/AndrivA89/key-value-store/internal/entity/transaction"
 )
 
-const loggerFileName = "transaction.log"
+var config = transaction.PostgresParams{
+	DbName: "postgres",
+	// К localhost подключиться не выйдет, т.к. контейнер изолирован от хоста
+	// и не может напрямую подключиться к сервисам, работающим на localhost компьютера,
+	// поэтому будет ошибка "connection refused".
+	Host:     "host.docker.internal",
+	User:     "postgres",
+	Password: "",
+}
 
 type server struct {
 	Store  *entity.Store
-	Logger FileLoggerInterface
+	Logger Logger
 }
 
 func Start() {
 	s := server{Store: &entity.Store{Values: make(map[string]string)}}
-	err := s.initLogger(loggerFileName)
+	err := s.initLogger(config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,10 +50,10 @@ func Start() {
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
-func (s *server) initLogger(fileName string) error {
+func (s *server) initLogger(config transaction.PostgresParams) error {
 	var err error
 
-	s.Logger, err = transaction.NewFileLogger(fileName)
+	s.Logger, err = transaction.NewPostgresLogger(config)
 	if err != nil {
 		return fmt.Errorf("failed to create transaction logger: %w", err)
 	}

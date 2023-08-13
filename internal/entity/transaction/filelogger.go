@@ -34,7 +34,7 @@ func (l *FileLogger) Err() <-chan error {
 	return l.errors
 }
 
-func NewFileLogger(fileName string) (FileLoggerInterface, error) {
+func NewFileLogger(fileName string) (Logger, error) {
 	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0755)
 	if err != nil {
 		return nil, fmt.Errorf("cannot open transaction log file: %w", err)
