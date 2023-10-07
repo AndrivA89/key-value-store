@@ -1,4 +1,4 @@
-package server
+package http
 
 import (
 	"errors"
@@ -22,9 +22,7 @@ func (s *server) keyValuePutHandler(c echo.Context) error {
 		return err
 	}
 
-	s.Logger.WritePut(key, value.Value)
-
-	err = s.Store.Put(key, value.Value)
+	err = s.store.Put(key, value.Value)
 	if err != nil {
 		return err
 	}
@@ -35,7 +33,7 @@ func (s *server) keyValuePutHandler(c echo.Context) error {
 func (s *server) keyValueGetHandler(c echo.Context) error {
 	key := c.QueryParam("key")
 
-	value, err := s.Store.Get(key)
+	value, err := s.store.Get(key)
 	if errors.Is(err, serverErrors.NotFoundError) {
 		return c.JSON(http.StatusNotFound, key)
 	}
@@ -49,9 +47,7 @@ func (s *server) keyValueGetHandler(c echo.Context) error {
 func (s *server) keyValueDeleteHandler(c echo.Context) error {
 	key := c.QueryParam("key")
 
-	s.Logger.WriteDelete(key)
-
-	err := s.Store.Delete(key)
+	err := s.store.Delete(key)
 	if errors.Is(err, serverErrors.NotFoundError) {
 		return c.JSON(http.StatusNotFound, key)
 	}
@@ -69,7 +65,8 @@ func errorHandler(err error, c echo.Context) {
 		Error interface{}
 	}
 	data.Error = err.Error()
-	if he, ok := err.(*echo.HTTPError); ok {
+	var he *echo.HTTPError
+	if errors.As(err, &he) {
 		data.Error = he.Message
 	}
 	c.Logger().Error(err)

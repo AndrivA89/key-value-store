@@ -1,13 +1,22 @@
 package server
 
-import "github.com/AndrivA89/key-value-store/internal/entity"
+import (
+	"github.com/AndrivA89/key-value-store/internal/entity"
+	"github.com/AndrivA89/key-value-store/internal/store"
+)
 
-type Logger interface {
-	WriteDelete(key string)
-	WritePut(key, value string)
-	Err() <-chan error
+type (
+	Server interface {
+		Start(store *store.Store) error
+	}
 
-	ReadEvents() (<-chan entity.Event, <-chan error)
+	Logger interface {
+		WriteDelete(key string)
+		WritePut(key, value string)
+		Err() <-chan error
 
-	Run()
-}
+		ReadEvents() (<-chan entity.Event, <-chan error)
+
+		Run()
+	}
+)
