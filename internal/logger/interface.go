@@ -1,4 +1,4 @@
-package transaction
+package logger
 
 import "github.com/AndrivA89/key-value-store/internal/entity"
 
